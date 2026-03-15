@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+<title>Smart Email Sorter</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+
+<h2 class="text-center mb-4">📧 Smart Email AI Dashboard</h2>
+
+<div class="alert alert-info text-center">
+🧠 AI Model Status: Active | Model: Naive Bayes
+</div>
+
+<button onclick="toggleDark()" class="btn btn-dark mb-3">
+Toggle Dark Mode
+</button>
+
+<div class="row text-center mb-4">
+
+<div class="col">
+<div class="card p-3 bg-danger text-white">
+<h5>High Priority</h5>
+<h3>{{high}}</h3>
+</div>
+</div>
+
+<div class="col">
+<div class="card p-3 bg-warning">
+<h5>Medium Priority</h5>
+<h3>{{medium}}</h3>
+</div>
+</div>
+
+<div class="col">
+<div class="card p-3 bg-success text-white">
+<h5>Low Priority</h5>
+<h3>{{low}}</h3>
+</div>
+</div>
+
+</div>
+
+<div class="card p-4 shadow">
+
+<form method="POST">
+
+<label>Email Subject</label> <input type="text" name="subject" class="form-control mb-3" required>
+
+<label>Email Body</label>
+
+<textarea name="body" class="form-control mb-3"></textarea>
+
+<button class="btn btn-primary w-100">Analyze Email</button>
+
+</form>
+
+{% if prediction %}
+
+<div class="mt-4 text-center">
+
+<h4>Predicted Priority</h4>
+
+{% if prediction == "High" %} <span class="badge bg-danger fs-5">High</span>
+{% elif prediction == "Medium" %} <span class="badge bg-warning text-dark fs-5">Medium</span>
+{% else %} <span class="badge bg-success fs-5">Low</span>
+{% endif %}
+
+<br><br>
+
+<h5>Spam Detection</h5>
+
+{% if spam == "Yes" %} <span class="badge bg-dark fs-6">Spam</span>
+{% else %} <span class="badge bg-success fs-6">Not Spam</span>
+{% endif %}
+
+<br><br>
+
+<h6>Confidence Score</h6>
+
+<span class="badge bg-info text-dark fs-6">
+{{confidence}}%
+</span>
+
+</div>
+
+{% endif %}
+
+</div>
+
+<hr>
+
+<h4>Upload Email CSV</h4>
+
+<form method="POST" enctype="multipart/form-data">
+
+<input type="file" name="file" class="form-control mb-3">
+
+<button class="btn btn-success">
+Analyze CSV Emails
+</button>
+
+</form>
+
+{% if bulk %}
+
+<hr>
+
+<h4>Bulk Email Results</h4>
+
+<table class="table table-bordered">
+
+<tr>
+<th>Subject</th>
+<th>Priority</th>
+</tr>
+
+{% for email in bulk %}
+
+<tr>
+<td>{{email.subject}}</td>
+<td>{{email.priority}}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endif %}
+
+<hr>
+
+<h4>Inbox Preview</h4>
+
+<div class="row">
+
+{% for email in history %}
+
+<div class="col-md-4 mb-3">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h6>{{email.subject}}</h6>
+
+<p>
+
+Priority:
+
+{% if email.priority == "High" %} <span class="badge bg-danger">High</span>
+
+{% elif email.priority == "Medium" %} <span class="badge bg-warning text-dark">Medium</span>
+
+{% else %} <span class="badge bg-success">Low</span>
+{% endif %}
+
+</p>
+
+<p>
+
+Spam:
+
+{% if email.spam == "Yes" %} <span class="badge bg-dark">Spam</span>
+
+{% else %} <span class="badge bg-success">Safe</span>
+{% endif %}
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<hr>
+
+<h4>Email History</h4>
+
+<input type="text" id="searchInput" class="form-control mb-3" placeholder="Search emails...">
+
+<table class="table table-striped" id="emailTable">
+
+<tr>
+<th>Subject</th>
+<th>Priority</th>
+<th>Spam</th>
+</tr>
+
+{% for email in history %}
+
+<tr>
+<td>{{ email.subject }}</td>
+<td>{{ email.priority }}</td>
+<td>{{ email.spam }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+<hr>
+
+<h4>Email Priority Chart</h4>
+
+<canvas id="chart"></canvas>
+
+<hr>
+
+<h4>AI Confidence Meter</h4>
+
+<div class="progress">
+
+<div class="progress-bar bg-info" 
+role="progressbar" 
+style="width: {{confidence}}%" 
+aria-valuenow="{{confidence}}" 
+aria-valuemin="0" 
+aria-valuemax="100">
+
+{{confidence}}%
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const ctx = document.getElementById('chart');
+
+new Chart(ctx, {
+type: 'bar',
+data: {
+labels: ['High','Medium','Low'],
+datasets: [{
+label: 'Email Count',
+data: [{{high}},{{medium}},{{low}}],
+borderWidth: 1
+}]
+}
+});
+
+function toggleDark(){
+document.body.classList.toggle("bg-dark");
+document.body.classList.toggle("text-white");
+}
+
+const searchInput = document.getElementById("searchInput");
+
+searchInput.addEventListener("keyup", function() {
+
+let filter = searchInput.value.toLowerCase();
+
+let rows = document.querySelectorAll("#emailTable tr");
+
+rows.forEach(function(row, index) {
+
+if(index === 0) return;
+
+let text = row.innerText.toLowerCase();
+
+row.style.display = text.includes(filter) ? "" : "none";
+
+});
+
+});
+
+</script>
+
+</body>
+</html>
