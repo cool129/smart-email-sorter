@@ -57,11 +57,11 @@ You should see the **Smart Email AI Dashboard**.
 
 # Project Structure
 
-smart-email-sorter
-app.py
-requirements.txt
-templates
-index.html
+smart-email-sorter,
+app.py,
+requirements.txt,
+templates,
+index.html,
 README.md
 
 ---
