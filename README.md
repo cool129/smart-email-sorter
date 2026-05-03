@@ -71,5 +71,14 @@ README.md
 This project is deployed using Render.
 
 Live demo:
-
 https://smart-email-sorter-wy88.onrender.com
+
+Here's the prompt to put in
+Subject	Body	Priority	Spam
+Urgent server issue	Server is down please fix	High	No
+Meeting reminder	Team meeting tomorrow	Medium	No
+Weekly newsletter	Updates for this week	Low	No
+Password reset required	Reset password immediately	High	No
+Win a free iPhone	Click here to claim prize	Low	Yes
+Crypto investment	double your money fast	Low	Yes
+Meeting reminder	Team meeting tomorrow	Medium	No
